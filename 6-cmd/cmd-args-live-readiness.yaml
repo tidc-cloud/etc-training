@@ -35,7 +35,16 @@ spec:
           failureThreshold: 5            
           httpGet:
             path: /?liveness
-            port: 80          
+            port: 80   
+        startupProbe:
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 6
+          successThreshold: 1
+          failureThreshold: 5            
+          httpGet:
+            path: /?startup
+            port: 80                    
         readinessProbe:
           initialDelaySeconds: 5
           periodSeconds: 5
