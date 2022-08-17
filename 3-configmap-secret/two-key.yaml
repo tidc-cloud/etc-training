@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  selector:
+    matchLabels:
+      app: my-nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: my-nginx
+    spec:
+      volumes:
+        - configMap:
+            name: two-key-cm
+          name: two-key
+      containers:
+      - name: my-nginx
+        image: nginx
+        volumeMounts:
+          - mountPath: /usr/share/nginx/html/two-key1
+            name: two-key
+          - mountPath: /usr/share/nginx/html/two-key2
+            name: two-key
+---            
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: two-key-cm
+data:
+  key1: "value1"
+  key2: "vaule2"
+
+ 

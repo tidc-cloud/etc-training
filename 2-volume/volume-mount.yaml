@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  selector:
+    matchLabels:
+      app: my-nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: my-nginx
+    spec:
+      volumes:
+        - persistentVolumeClaim:
+            claimName: mydisk
+          name: htmlhome
+      containers:
+      - name: my-nginx
+        image: nginx
+        volumeMounts:
+          - mountPath: /usr/share/nginx/html/data
+            name: htmlhome
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mydisk
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+# k exec -it my-nginx-7d7945ff7f-c5glx -- sh -c 'echo "hi">/usr/share/nginx/html/data/index.html'

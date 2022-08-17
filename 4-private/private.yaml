@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  
+  selector:
+    matchLabels:
+      app: my-nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: my-nginx
+    spec:
+      imagePullSecrets: 
+      - name: tksdemo
+      containers:
+      - name: my-nginx
+        image: tksdemo/my-nginx
+ 

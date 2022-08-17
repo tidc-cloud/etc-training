@@ -1,0 +1,30 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  selector:
+    matchLabels:
+      app: my-nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: my-nginx
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: container1
+        command:
+          - "sh"
+          - "-c"
+          - "echo"
+        image: nginx
+        env:             
+        - name: pod-name
+          valueFrom:
+            fieldRef:
+              fieldPath: "metadata.labels['app']"
+ 
+       

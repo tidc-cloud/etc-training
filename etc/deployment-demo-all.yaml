@@ -1,0 +1,154 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  selector:
+    matchLabels:
+      app: my-nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: my-nginx
+    spec:
+      serviceAccountName: default
+ 
+      containers:
+      - name: container1
+        command:
+          - "sh"
+          - "-c"
+          - "echo"
+        args:
+          - "hello"
+          - "world"
+        image: nginx
+        ports:
+        - containerPort: 80
+          # hostIP: 
+          # hostPort: 
+          # name: http
+          protocol: TCP
+
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            cpu: 200m
+            memory: 1G
+            ephemeral-storage: "2Gi"
+            example.com/foo: "1"
+        livenessProbe:
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 6
+          successThreshold: 1
+          failureThreshold: 5            
+          httpGet:
+            path: /healthz
+            port: 8080            
+        readinessProbe:
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 2
+          successThreshold: 1
+          failureThreshold: 5
+          exec:
+            command:
+              - sh
+              - -c
+              - /scripts/ping_readiness_local.sh 1
+        env:
+        # defined as key 'admin-user' of secret 'example'
+        - name: GF_SECURITY_ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              key: admin-user
+              name: example
+        # defined as key 'admin-user' of configmap 'example'
+        - name: GF_SECURITY_ADMIN_USER
+          valueFrom:
+            configMapKeyRef:
+              key: admin-user
+              name: example              
+        # (metadata.name)              
+        - name: pod-name
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name  
+        # /var/lib/grafana/   
+        - name: GF_PATHS_DATA
+          value: /var/lib/grafana/
+         # unsupported type 'resourceFieldRef' please check yaml for more detail.
+        - name: pod-name
+          valueFrom:
+            resourceFieldRef:
+              resource: limits.cpu
+              
+        volumeMounts:
+        - mountPath: /etc/grafana/grafana.ini
+          name: config
+          subPath: grafana.ini
+        - mountPath: /etc/grafana/grafana2.ini
+          name: secret
+          subPath: grafana.ini  
+        - mountPath: /var/lib/grafana
+          name: storage          
+        - mountPath: /empty
+          name: myempty    
+        - mountPath: /log
+          name: logpath 
+ 
+
+
+      volumes:
+      - name: config
+        configMap:
+          defaultMode: 420          
+          name: example-cm
+        
+      - secret:
+          defaultMode: 420          
+          secretName: example-secret
+        name: secret
+
+      - name: storage
+        persistentVolumeClaim:    
+          readOnly: false
+          claimName: example-pvc
+
+      - name: myempty
+        emptyDir: {}          
+      - hostPath:
+          path: /var/log
+        name: logpath
+ 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: example-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+data:
+  grafana.ini: "1"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: example-cm
+
+apiVersion: v1
+data:
+  grafana.ini: "MQo="
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: example-secret
