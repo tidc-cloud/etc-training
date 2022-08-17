@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: my-nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: my-nginx
+    spec:
+      containers:
+      - name: my-nginx
+        image: nginx:1.23.1
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            cpu: 200m       
+            memory: 200Mi 
+        command: ["nginx-debug","-g"]
+        args: [ "daemon off;"]
+        livenessProbe:
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 6
+          successThreshold: 1
+          failureThreshold: 5            
+          httpGet:
+            path: /?liveness
+            port: 80          
+        readinessProbe:
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 2
+          successThreshold: 1
+          failureThreshold: 5
+          httpGet:
+            path: /?readiness
+            port: 80            
+          # exec:
+          #   command:
+          #     - sh
+          #     - -c
+          #     - echo "ok"  
