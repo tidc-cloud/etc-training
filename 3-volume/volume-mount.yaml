@@ -15,14 +15,31 @@ spec:
       volumes:
         - persistentVolumeClaim:
             claimName: mydisk
-          name: htmlhome
+          name: mypvc
+        - name: myempty
+          emptyDir: {}                    
+        - hostPath:
+            path: /var/log
+          name: logpath
+           
       containers:
       - name: my-nginx
         image: nginx
         volumeMounts:
-          - mountPath: /usr/share/nginx/html/data
-            name: htmlhome
+          - mountPath: /usr/share/nginx/html/mypvc
+            name: mypvc
+          - mountPath: /tmp/logpath
+            name: logpath
+          - mountPath: /usr/share/nginx/html/myempty
+            name: myempty
 
+
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            cpu: 200m       
+            memory: 200Mi 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
