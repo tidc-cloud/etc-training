@@ -14,8 +14,8 @@ spec:
         app: my-nginx
     spec:
       imagePullSecrets: 
-      - name: tksdemo
+      - name: tks-sandbox
       containers:
       - name: my-nginx
-        image: tksdemo/my-nginx
+        image: tcr.tks.trueidc.com/sandbox-private/my-nginx
  
