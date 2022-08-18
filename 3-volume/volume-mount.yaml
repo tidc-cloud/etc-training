@@ -7,6 +7,11 @@ spec:
     matchLabels:
       app: my-nginx
   replicas: 1
+  strategy:
+    type: Recreate
+    # rollingUpdate:
+    #   maxSurge: 0
+    #   maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -16,8 +21,10 @@ spec:
         - persistentVolumeClaim:
             claimName: mydisk
           name: mypvc
+
         - name: myempty
-          emptyDir: {}                    
+          emptyDir: {}  
+
         - hostPath:
             path: /var/log
           name: logpath
@@ -26,10 +33,14 @@ spec:
       - name: my-nginx
         image: nginx
         volumeMounts:
+
           - mountPath: /usr/share/nginx/html/mypvc
             name: mypvc
+
           - mountPath: /tmp/logpath
             name: logpath
+
+
           - mountPath: /usr/share/nginx/html/myempty
             name: myempty
 
@@ -49,6 +60,7 @@ spec:
   accessModes:
   - ReadWriteOnce
   resources:
+
     requests:
       storage: 100Mi
 
