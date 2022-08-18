@@ -28,6 +28,7 @@ spec:
         command: ["nginx-debug","-g"]
         args: [ "daemon off;"]
         livenessProbe:
+          
           initialDelaySeconds: 5
           periodSeconds: 5
           timeoutSeconds: 6
@@ -59,3 +60,10 @@ spec:
           #     - sh
           #     - -c
           #     - echo "ok"  
+        lifecycle:
+          postStart:
+            exec:
+              command:
+                - sh
+                - -c
+                - date > /tmp/boot_time.txt              
