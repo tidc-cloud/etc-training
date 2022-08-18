@@ -14,11 +14,31 @@ spec:
     spec:
       imagePullSecrets: 
       - name: tksdemo
+      volumes:
+      - persistentVolumeClaim:
+          claimName: mydisk
+        name: mypvc
       initContainers:
       - name: init-myservice
         image: busybox:1.28
-        command: ['sh', '-c', "echo testing"]
+        command: ['sh', '-c', "echo testing>/usr/share/nginx/html/mypvc/hello.html"]
+        volumeMounts:
+          - mountPath: /usr/share/nginx/html/mypvc
+            name: mypvc
       containers:
       - name: my-nginx
-        image: my-nginx
- 
+        image: nginx:1.23.1
+        volumeMounts:
+          - mountPath: /usr/share/nginx/html/mypvc
+            name: mypvc        
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mydisk
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
