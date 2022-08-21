@@ -19,6 +19,9 @@ spec:
       containers:
       - name: my-nginx
         image: nginx:1.23.1
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN", "SYS_TIME"]        
         resources:
           requests:
             cpu: 100m
