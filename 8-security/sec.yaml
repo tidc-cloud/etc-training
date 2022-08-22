@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: my-nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: my-nginx
+    spec:
+      # restartPolicy : Never
+      securityContext:
+         fsGroup: 101
+         runAsUser: 101
+         runAsGroup: 101
+         supplementalGroups:
+           - 0
+      containers:
+      - name: my-nginx
+        image: nginx:1.23.1
+        command: ["tail","-f"]
+        # args: [ "daemon off;"]        
+        
+ 
