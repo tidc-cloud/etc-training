@@ -23,22 +23,40 @@ spec:
             cpu: 200m
       affinity:    
         podAntiAffinity:
-
+      
           preferredDuringSchedulingIgnoredDuringExecution:
             - weight: 50
               podAffinityTerm:
                 topologyKey: kubernetes.io/hostname      
-                labelSelector:
+                labelSelector:                  
                   matchExpressions:
                     - key: app
                       operator: In
                       values:
                         - my-nginx          
+            - weight: 5
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname      
+                labelSelector:                  
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - kob
+                                                
         nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
+          requiredDuringSchedulingIgnoredDuringExecution:            
             nodeSelectorTerms:
-              - matchExpressions:
+              - matchExpressions:                  
                   - key: dc
                     operator: In
                     values:
                       - thai        
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:                  
+                    - key: dc
+                      operator: In
+                      values:
+                        - thai                  
+              weight: 1

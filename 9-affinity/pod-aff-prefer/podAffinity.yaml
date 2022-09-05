@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kob
+spec:
+  selector:
+    matchLabels:
+      app: kob
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: kob
+    spec:
+      containers:
+      - name: kob
+        image: nginx:1.23.1
+        resources:
+          limits:
+            memory: 200Mi
+            cpu: 200m              
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rung
+spec:
+  selector:
+    matchLabels:
+      app: rung
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: rung
+    spec:
+      containers:
+      - name: rung
+        image: nginx:1.23.1
+        resources:
+          limits:
+            memory: 200Mi
+            cpu: 200m              
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  selector:
+    matchLabels:
+      app: my-nginx
+  replicas: 7
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: my-nginx
+    spec:
+      containers:
+      - name: my-nginx
+        image: nginx:1.23.1
+        resources:
+          limits:
+            memory: 200Mi
+            cpu: 200m
+      affinity:     
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 50
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname      
+                labelSelector:                  
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - rung
+            - weight: 51
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname      
+                labelSelector:                  
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - kob                        

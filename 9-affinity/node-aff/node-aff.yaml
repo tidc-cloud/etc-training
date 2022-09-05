@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  selector:
+    matchLabels:
+      app: my-nginx
+  replicas: 7
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: my-nginx
+    spec:
+      containers:
+      - name: my-nginx
+        image: nginx:1.23.1
+        resources:
+          limits:
+            memory: 200Mi
+            cpu: 200m
+      affinity:    
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:            
+            nodeSelectorTerms:
+              - matchExpressions:                  
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                      - linux     
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                      - linux2                      
+              # - matchFields:
+              #     - key: metadata.name
+              #       operator: In 
+              #       values:
+              #         - "test-create-worker-88dj88z4f4"
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:                  
+                    - key: topology.cinder.csi.openstack.org/zone
+                      operator: In
+                      values:
+                        - ap-southeast-214a                  
+              weight: 1

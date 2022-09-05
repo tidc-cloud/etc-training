@@ -21,7 +21,7 @@ spec:
           limits:
             memory: 200Mi
             cpu: 200m
-      affinity:        
+      affinity:     
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
@@ -29,5 +29,5 @@ spec:
                   - key: app
                     operator: In
                     values:
-                      - my-nginx
+                      - my-nginx 
               topologyKey: kubernetes.io/hostname  
