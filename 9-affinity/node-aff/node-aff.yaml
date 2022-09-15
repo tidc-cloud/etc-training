@@ -20,30 +20,27 @@ spec:
         resources:
           limits:
             memory: 200Mi
-            cpu: 200m
+            # cpu: 1m
       affinity:    
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:            
-            nodeSelectorTerms:
-              - matchExpressions:                  
-                  - key: kubernetes.io/os
-                    operator: In
+            nodeSelectorTerms:       #orrrrrrrrrrrrrrrrrr 
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In 
                     values:
-                      - linux     
-                  - key: kubernetes.io/os
-                    operator: In
-                    values:
-                      - linux2                      
-              # - matchFields:
-              #     - key: metadata.name
-              #       operator: In 
-              #       values:
-              #         - "test-create-worker-88dj88z4f4"
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - preference:
-                matchExpressions:                  
-                    - key: topology.cinder.csi.openstack.org/zone
-                      operator: In
-                      values:
-                        - ap-southeast-214a                  
-              weight: 1
+                      - "test-create-worker-yu1kku9q8q"
+          # preferredDuringSchedulingIgnoredDuringExecution:
+     
+          #   - preference:
+          #       matchFields:
+          #         - key: metadata.name  # k8s 1.11
+          #           operator: In
+          #           values:
+          #             - "test-create-worker-yu1kku9q8q"
+          #       matchExpressions:                  
+          #           - key: kubernetes.io/hostname
+          #             operator: In
+          #             values:
+          #               - test-create-worker-yu1kku9q8q               
+          #     weight: 1           
