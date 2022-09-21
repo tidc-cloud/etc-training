@@ -8,11 +8,12 @@ kind: StatefulSet
 metadata:
   name: my-nginx-sts
 spec:  
-  minReadySeconds: 10  # wait x sec after ready before update next pod  
+  #minReadySeconds: 10 #KUBE 1.25  # wait x sec after ready before update next pod  
   serviceName: my-nginx-sts  #1
   podManagementPolicy: Parallel #OrderedReady
   updateStrategy: #2
     type: RollingUpdate     #RollingUpdate  #OnDelete
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: my-nginx-sts
@@ -30,7 +31,9 @@ spec:
           mountPath: /usr/share/nginx/html/contact
         - name: contact-vol
           mountPath: /usr/share/nginx/html/contact2
-
+      # volumes:
+      #   - name: contact-vol #unpredictable if same name
+      #     emptyDir: {}           
   volumeClaimTemplates:   #3
   - metadata:
       name: contact-vol
