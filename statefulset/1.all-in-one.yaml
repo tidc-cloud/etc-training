@@ -1,0 +1,80 @@
+
+# number masking is differential point compare to deployment
+# note:
+# for edit  : Forbidden: updates to statefulset spec for fields other than 'replicas', 'template', and 'updateStrategy' are forbidden
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: my-nginx-sts
+spec:  
+  minReadySeconds: 10  # wait x sec after ready before update next pod  
+  serviceName: my-nginx-sts  #1
+  podManagementPolicy: Parallel #OrderedReady
+  updateStrategy: #2
+    type: RollingUpdate     #RollingUpdate  #OnDelete
+  selector:
+    matchLabels:
+      app: my-nginx-sts
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: my-nginx-sts
+    spec:
+      containers:
+      - name: my-nginx-sts
+        image: nginx:1.23.1
+        volumeMounts:
+        - name: contact-vol
+          mountPath: /usr/share/nginx/html/contact
+        - name: contact-vol
+          mountPath: /usr/share/nginx/html/contact2
+
+  volumeClaimTemplates:   #3
+  - metadata:
+      name: contact-vol
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "default"  
+      resources:
+        limits:
+          storage: 100Mi
+        requests:
+          storage: 100Mi  
+          
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-nginx-sts
+  labels:
+    app: my-nginx-sts
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: my-nginx-sts
+  clusterIP: None  #4 (default to None for statefulset)
+---
+apiVersion: 'networking.k8s.io/v1'
+kind: 'Ingress'
+metadata:
+    labels:
+        app: my-nginx-sts
+    name: my-nginx-sts
+spec:
+    ingressClassName: nginx    
+    rules:
+      - host: 'my-nginx-sts.1j44pm75z4o0b.dev.nxcp.trueidc.com'
+        http:
+            paths:
+              - backend:
+                    service:
+                        name: my-nginx-sts
+                        port:
+                            number: 80
+                path: '/'
+                pathType: 'Prefix'
