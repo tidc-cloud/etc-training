@@ -10,7 +10,7 @@ metadata:
 spec:  
   #minReadySeconds: 10 #KUBE 1.25  # wait x sec after ready before update next pod  
   serviceName: my-nginx-sts  #1
-  podManagementPolicy: Parallel #OrderedReady
+  podManagementPolicy: OrderedReady
   updateStrategy: #2
     type: RollingUpdate     #RollingUpdate  #OnDelete
   revisionHistoryLimit: 10
@@ -23,20 +23,16 @@ spec:
       labels:
         app: my-nginx-sts
     spec:
+      
       containers:
       - name: my-nginx-sts
         image: nginx:1.23.1
         volumeMounts:
-        - name: contact-vol
+        - name: my-disk
           mountPath: /usr/share/nginx/html/contact
-        - name: contact-vol
-          mountPath: /usr/share/nginx/html/contact2
-      # volumes:
-      #   - name: contact-vol #unpredictable if same name
-      #     emptyDir: {}           
   volumeClaimTemplates:   #3
   - metadata:
-      name: contact-vol
+      name: my-disk
     spec:
       accessModes: [ "ReadWriteOnce" ]
       storageClassName: "default"  
