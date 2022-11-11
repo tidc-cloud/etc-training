@@ -1,11 +1,17 @@
+#k8s 1.20 => batch/v1
+
 apiVersion: batch/v1beta1
+
 kind: CronJob
 metadata:
-  name: hello
+  name: para
 spec:
   schedule: "* * * * *"
   jobTemplate:
     spec:
+      backoffLimit: 6
+      completions: 4
+      parallelism: 2
       template:
         spec:
           containers:
@@ -15,7 +21,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - date; echo Hello from the Kubernetes cluster
+            - echo Hello from the Kubernetes cluster;sleep 10
           restartPolicy: Never # or OnFailure
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
