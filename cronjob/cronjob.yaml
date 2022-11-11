@@ -25,3 +25,4 @@ spec:
           restartPolicy: Never # or OnFailure
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
+  suspend: true
