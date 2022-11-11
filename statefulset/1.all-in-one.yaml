@@ -9,7 +9,7 @@ metadata:
   name: my-nginx-sts
 spec:  
   #minReadySeconds: 10 #KUBE 1.25  # wait x sec after ready before update next pod  
-  serviceName: my-nginx-sts  #1
+  serviceName: my-nginx-sts2  #1
   podManagementPolicy: OrderedReady
   updateStrategy: #2
     type: RollingUpdate     #RollingUpdate  #OnDelete
